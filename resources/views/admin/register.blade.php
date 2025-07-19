@@ -27,7 +27,8 @@
             <div class="wg-box">
                    @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+                @endif
+    
 
                 <form class="form-new-user form-style-1" action="{{ route('admin.register.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf

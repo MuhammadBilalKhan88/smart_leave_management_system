@@ -1,6 +1,6 @@
 @extends('layouts.dashboard.admin')
 @section('content')
-   <div class="main-content-inner">
+    <div class="main-content-inner">
         <div class="main-content-wrap">
             <div class="flex items-center flex-wrap justify-between gap20 mb-27">
                 <h3>Employees</h3>
@@ -24,20 +24,20 @@
                     <div class="wg-filter flex-grow">
                         <form class="form-search">
                             <fieldset class="name">
-                                <input type="text" placeholder="Search here..." class="" name="name"
-                                    tabindex="2" value="" aria-required="true" required="">
+                                <input type="text" placeholder="Search here..." class="" name="name" tabindex="2" value=""
+                                    aria-required="true" required="">
                             </fieldset>
                             <div class="button-submit">
                                 <button class="" type="submit"><i class="icon-search"></i></button>
                             </div>
                         </form>
                     </div>
-                    <a class="tf-button style-1 w208" href="{{ route('admin.register') }}"><i class="icon-plus"></i>Add
+                    <a class="tf-button style-1 w208" href="{{ route('admin.employee.add') }}"><i class="icon-plus"></i>Add
                         new</a>
                 </div>
                 <div class="wg-table table-all-user">
                     <div class="table-responsive">
-                      
+
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
@@ -57,7 +57,7 @@
                                 @foreach ($Employees as $employe)
                                     <tr>
                                         <td>{{ $employe->id }}</td>
-                                     
+
                                         <td>{{ $employe->emp_name }}</td>
                                         <td>{{ $employe->emp_email }}</td>
                                         <td><span class="m-5">{{ $employe->emp_phone}}</span></td>
@@ -66,26 +66,31 @@
                                             {{ $employe->emp_departments}}
                                             <b>Position:</b>
                                             {{ $employe->emp_position}}
-                                        
+
                                         </td>
                                         <td>{{ $employe->emp_salary}}</td>
                                         <td>{{ $employe->emp_timing}}</td>
                                         <td>{{ $employe->emp_total_leaves}}</td>
                                         <td>{{ $employe->emp_total_taken}}</td>
-                                    
+
                                         <td>
                                             <div class="list-icon-function">
-                                                <a href="#">
+                                                <a href="{{ route('admin.employee.edit', ['id' => $employe->id]) }}">
                                                     <div class="item edit">
                                                         <i class="icon-edit-3"></i>
                                                     </div>
                                                 </a>
-                                              
-                                                      <button  class="item text-danger delete"
+
+                                                <form action="{{ route('admin.employee.delete', ['id' => $employe->id]) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="item text-danger delete"
                                                         style="background: none; border: none;">
                                                         <i class="icon-trash-2"></i>
                                                     </button>
-                                 
+                                                </form>
+
                                             </div>
                                         </td>
                                     </tr>
@@ -103,3 +108,28 @@
         </div>
     </div>
 @endsection
+@push('script')
+    <script>
+        $(function () {
+            $('.delete').on('click', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'Are You Sure?',
+                    text: 'You Want To Delete This Record?',
+                    icon: 'warning',
+                    showcancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

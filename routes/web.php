@@ -16,24 +16,27 @@ Auth::routes();
 
 Route::get('/',  [HomeController::class, 'index'])->name('index');
 
-Route::middleware(['auth',AuthEmployee::class])->group(function(){
-    
+Route::middleware(['auth', AuthEmployee::class])->group(function () {
+
     Route::get('/',  [EmpolyeeController::class, 'index'])->name('index');
     Route::get('/leavesForm',  [EmpolyeeController::class, 'employee_leaves_request_form'])->name('employee.leaves.request.form');
     Route::get('/leavesFormHistory',  [EmpolyeeController::class, 'employee_leaves_request_history'])->name('employee.leaves.request.histroy');
-
 });
 
-Route::middleware(['auth', AuthAdmin::class])->group(function(){
-    
+Route::middleware(['auth', AuthAdmin::class])->group(function () {
+
     Route::get('/admin',  [AdminController::class, 'admin_index'])->name('admin.index');
-    
+
     Route::get('/admin/leaverequest',  [AdminController::class, 'admin_all_leaves_requests'])->name('admin.leave_request');
-    
+
 
     Route::get('/admin/employees',  [AdminController::class, 'admin_all_employees'])->name('admin.all_employees');
-    Route::get('/admin/employee/add',[AdminController::class,'admin_employee_add'])->name('admin.employee.add');
-    Route::POST('/admin/employee/store',[AdminController::class,'admin_employee_store'])->name('admin.employee.store');
+    Route::get('/admin/employee/add', [AdminController::class, 'admin_employee_add'])->name('admin.employee.add');
+    Route::POST('/admin/employee/store', [AdminController::class, 'admin_employee_store'])->name('admin.employee.store');
+    Route::get('/admin/employee/edit/{id}', [AdminController::class, 'admin_employee_edit'])->name('admin.employee.edit');
+    Route::put('/admin/employee/update', [AdminController::class, 'admin_employee_update'])->name('admin.employee.update');
+    Route::Delete('/admin/employee/delete/{id}', [AdminController::class, 'admin_employee_delete'])->name('admin.employee.delete');
+
 
 
 
