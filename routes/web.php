@@ -19,7 +19,9 @@ Route::get('/',  [HomeController::class, 'index'])->name('index');
 Route::middleware(['auth', AuthEmployee::class])->group(function () {
 
     Route::get('/',  [EmpolyeeController::class, 'index'])->name('index');
+    
     Route::get('/leavesForm',  [EmpolyeeController::class, 'employee_leaves_request_form'])->name('employee.leaves.request.form');
+    Route::post('/leavesFrom',[EmpolyeeController::class, 'employee_leaves_request_store'])->name('employee.leaves.request.store');
     Route::get('/leavesFormHistory',  [EmpolyeeController::class, 'employee_leaves_request_history'])->name('employee.leaves.request.histroy');
 });
 

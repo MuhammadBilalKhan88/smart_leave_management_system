@@ -73,9 +73,8 @@
                     <fieldset class="name">
 
                         <div class="body-title">Phone Number<span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="number" min="11" placeholder="Employee Phone Number"
-                            name="emp_phone" tabindex="0" value="{{ old('emp_phone') }}" aria-required="true"
-                            required="">
+                        <input class="flex-grow" type="number" min="11" placeholder="Employee Phone Number" name="emp_phone"
+                            tabindex="0" value="{{ old('emp_phone') }}" aria-required="true" required="">
 
                     </fieldset>
                     @error('emp_phone')
@@ -86,8 +85,8 @@
                     <fieldset class="name">
 
                         <div class="body-title">Address<span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="text" placeholder="Employee Address" name="emp_address"
-                            tabindex="0" value="{{ old('emp_address') }}" aria-required="true" required="">
+                        <input class="flex-grow" type="text" placeholder="Employee Address" name="emp_address" tabindex="0"
+                            value="{{ old('emp_address') }}" aria-required="true" required="">
 
                     </fieldset>
                     @error('emp_address')
@@ -118,8 +117,8 @@
 
                     <fieldset class="name">
                         <div class="body-title">Salary <span class="tf-color-1">*</span></div>
-                        <input class="form-control" type="number" name="emp_salary" placeholder="Enter salary"
-                            min="0" max="1000000" step="0.01" value="{{ old('emp_salary') }}" required>
+                        <input class="form-control" type="number" name="emp_salary" placeholder="Enter salary" min="0"
+                            max="1000000" step="0.01" value="{{ old('emp_salary') }}" required>
                     </fieldset>
                     @error('emp_salary')
                         <span class="alert alert-danger text-center">{{ $message }}</span>
@@ -137,8 +136,8 @@
 
                     <fieldset class="name">
                         <div class="body-title">Timing <span class="tf-color-1">*</span></div>
-                        <input class="form-control" type="text" name="emp_timing"
-                            placeholder="e.g. 9:00 AM - 6:00 PM" value="{{ old('emp_timing') }}" required>
+                        <input class="form-control" type="text" name="emp_timing" placeholder="e.g. 9:00 AM - 6:00 PM"
+                            value="{{ old('emp_timing') }}" required>
                     </fieldset>
 
                     @error('emp_timing')

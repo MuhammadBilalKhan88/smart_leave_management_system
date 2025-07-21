@@ -61,11 +61,16 @@ class AdminController extends Controller
 
         ]);
 
-        $user = new User();
-        $user->name = $request->emp_name;
-        $user->email = $request->emp_email;
-        $user->password = Hash::make($request->password);
-        $user->save();
+
+        $user = User::where('email', $request->emp_email)->first();
+        if (!$user) {
+
+            $user = new User();
+            $user->name = $request->emp_name;
+            $user->email = $request->emp_email;
+            $user->password = Hash::make($request->password);
+            $user->save();
+        }
 
 
         $employee = new Employee();
@@ -155,4 +160,6 @@ class AdminController extends Controller
 
         return redirect()->route('admin.all_employees')->with('success', 'Employee and User deleted successfully.');
     }
+
+    
 }

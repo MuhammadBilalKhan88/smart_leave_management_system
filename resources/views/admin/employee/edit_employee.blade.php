@@ -26,10 +26,10 @@
 
             <!-- new-category -->
             <div class="wg-box">
-          
-                   @if (session('Status'))
-            <div class="alert alert-success">{{ session('Status') }}</div>
-@endif
+
+                @if (session('Status'))
+                    <div class="alert alert-success">{{ session('Status') }}</div>
+                @endif
                 <form class="form-new-employee form-style-1" action="{{  route('admin.employee.update') }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
@@ -62,8 +62,8 @@
                     <fieldset class="name">
 
                         <div class="body-title">Password <span class="tf-color-1">*</span></div>
-                        <input class="flex-grow" type="password" placeholder="Employee Password" tabindex="0"
-                            value="" name="password"  autocomplete="new-password">
+                        <input class="flex-grow" type="password" placeholder="Employee Password" tabindex="0" value=""
+                            name="password" autocomplete="new-password">
 
                     </fieldset>
 

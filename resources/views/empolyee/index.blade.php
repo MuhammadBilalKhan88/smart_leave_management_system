@@ -15,7 +15,7 @@
                                 </div>
                                 <div>
                                     <div class="body-text mb-2">All Leaves</div>
-                                    
+
                                     <h4>{{ $employee->emp_total_leaves }}</h4>
                                 </div>
                             </div>
@@ -29,7 +29,7 @@
                                 </div>
                                 <div>
                                     <div class="body-text mb-2">Department</div>
-                                    
+
                                     <h4>{{ $employee->emp_departments }}</h4>
                                 </div>
                             </div>
@@ -43,7 +43,7 @@
                                 </div>
                                 <div>
                                     <div class="body-text mb-2">Salary</div>
-                                    
+
                                     <h4>Rs:{{ $employee->emp_salary }}</h4>
                                 </div>
                             </div>
@@ -60,14 +60,15 @@
                                     <i class="fa-solid fa-users"></i>
                                 </div>
                                 <div>
-                                    <div class="body-text mb-2">Leaves Taken <h4>{{ $employee->emp_total_taken }}</h4></div>
-                                  
+                                    <div class="body-text mb-2">Leaves Taken <h4>{{ $employee->emp_total_taken }}</h4>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                      <div class="wg-chart-default mt-5 mb-5">
+                    <div class="wg-chart-default mt-5 mb-5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap14">
                                 <div class="image ic-bg">
@@ -75,13 +76,13 @@
                                 </div>
                                 <div>
                                     <div class="body-text mb-2">Position</div>
-                                    
+
                                     <h4>{{ $employee->emp_position }}</h4>
                                 </div>
                             </div>
                         </div>
                     </div>
-                      <div class="wg-chart-default mt-5 mb-5">
+                    <div class="wg-chart-default mt-5 mb-5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap14">
                                 <div class="image ic-bg">
@@ -89,7 +90,7 @@
                                 </div>
                                 <div>
                                     <div class="body-text mb-2">Timing</div>
-                                    
+
                                     <h4>{{ $employee->emp_timing }}</h4>
                                 </div>
                             </div>
@@ -107,55 +108,53 @@
                     <div class="flex items-center justify-between">
                         <h5>Leaves Histroy</h5>
                         <div class="dropdown default">
-                            <a class="btn btn-secondary dropdown-toggle" href="#">
+                            <a class="btn btn-secondary dropdown-toggle" href="{}">
                                 <span class="view-all">View all</span>
                             </a>
                         </div>
                     </div>
                     <div class="wg-table table-all-user">
                         <div class="table-responsive">
-                            <table class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 80px">OrderNo</th>
-                                        <th>Name</th>
-                                        <th class="text-center">Phone</th>
-                                        <th class="text-center">Subtotal</th>
-                                        <th class="text-center">Tax</th>
-                                        <th class="text-center">Total</th>
+                            
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Leave Type</th>
+                                    <th>Reason</th>
+                                    <th>From Date</th>
+                                    <th>To Date</th>
+                                    <th>Status</th>
+                                    <th>AI Feedback</th>
+                                    <th>Applied On</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($leaves as $leave)
+                                      <tr>
+                    <td>{{ $leave->leave_type }}</td>
+                    <td>{{ $leave->Reason }}</td>
+                    <td>{{ $leave->from_date }}</td>
+                    <td>{{ $leave->to_date }}</td>
+                    <td>
+                        @if($leave->status === 'Approved')
+                            <span class="badge bg-success">Approved</span>
+                        @elseif($leave->status === 'Rejected')
+                            <span class="badge bg-danger">Rejected</span>
+                        @else
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        @endif
+                    </td>
+                    <td>{{ $leave->status ?? 'N/A' }}</td>
+                    <td>{{ $leave->created_at->format('d-m-Y') }}</td>
+                </tr>
+                                @endforeach
 
-                                        <th class="text-center">Status</th>
-                                        <th class="text-center">Order Date</th>
-                                        <th class="text-center">Total Items</th>
-                                        <th class="text-center">Delivered On</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="text-center">1</td>
-                                        <td class="text-center">Divyansh Kumar</td>
-                                        <td class="text-center">1234567891</td>
-                                        <td class="text-center">$172.00</td>
-                                        <td class="text-center">$36.12</td>
-                                        <td class="text-center">$208.12</td>
-
-                                        <td class="text-center">ordered</td>
-                                        <td class="text-center">2024-07-11 00:54:14</td>
-                                        <td class="text-center">2</td>
-                                        <td></td>
-                                        <td class="text-center">
-                                            <a href="#">
-                                                <div class="list-icon-function view-icon">
-                                                    <div class="item eye">
-                                                        <i class="icon-eye"></i>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            </tbody>
+                        </table>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
+                            {{ $leaves->links('pagination::bootstrap-5') }}
                         </div>
                     </div>
                 </div>
