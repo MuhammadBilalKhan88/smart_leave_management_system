@@ -27,11 +27,27 @@
             <!-- new-category -->
             <div class="wg-box">
                 @if (session('Status'))
-                    <div class="alert alert-success">{{ session('Status') }}</div>
+
+                    @if (session('Status') === 'Leave Approved')
+
+                        <div class="alert alert-success">
+                            <h5>{{ session('Status') }}</h5>
+                        </div>
+
+                    @elseif (session('Status') === 'Leave Rejected')
+
+                        <div class="alert alert-danger">
+                            <h5>{{ session('Status') }}</h5>
+                        </div>
+
+
+                  
+                    @endif
                 @endif
 
-                <form class="form-new-employee form-style-1" action="{{ route('employee.leaves.request.store') }}" method="POST"
-                    enctype="multipart/form-data">
+
+                <form class="form-new-employee form-style-1" action="{{ route('employee.leaves.request.store') }}"
+                    method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <fieldset class="name">

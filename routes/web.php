@@ -38,6 +38,9 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::get('/admin/employee/edit/{id}', [AdminController::class, 'admin_employee_edit'])->name('admin.employee.edit');
     Route::put('/admin/employee/update', [AdminController::class, 'admin_employee_update'])->name('admin.employee.update');
     Route::Delete('/admin/employee/delete/{id}', [AdminController::class, 'admin_employee_delete'])->name('admin.employee.delete');
+    
+    Route::put('/admin/employee/leave/{id}', [AdminController::class, 'admin_leave_edit'])->name('admin.leave.edit');
+    Route::Delete('/admin/employee/leave/{id}', [AdminController::class, 'admin_leave_delete'])->name('admin.leave.delete');
 
 
 

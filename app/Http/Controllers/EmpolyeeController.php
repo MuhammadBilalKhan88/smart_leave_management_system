@@ -127,28 +127,31 @@ class EmpolyeeController extends Controller
 
         $user = Auth::user();
         $employee = Employee::where('user_id', $user->id)->first();
-        if (!$employee) {
-            return back()->withErrors(['Status' => 'Employee record missing.']);
-        }
+       
 
         $from = Carbon::parse($request->from_date);
         $to   = Carbon::parse($request->to_date);
         $totalDays = $from->diffInDays($to) + 1;
 
-        $prompt = "Employee ne {$totalDays} din ki chutti maangi hai for reason: {$request->Reason}. " .
+        
+
+
+
+        $prompt = "The employee has requested {$totalDays} days of leave for the reason: {$request->Reason} " .
             "Total allowed leaves: {$employee->emp_total_leaves}, " .
-            "Taken: {$employee->emp_total_taken}. " .
+            "Already taken: {$employee->emp_total_taken}. " .
             "Should this be approved or rejected? Please reply only as JSON like " .
             "{\"decision\":\"Approved\"|\"Rejected\",\"why\":\"short reason\"}.";
 
         $aiDecision = 'Pending';
-        $aiWhy = null;
+        $decisionReson = null;
 
-        // ✅ Manual Check: if leaves exceed limit, auto reject
-        $totalTakenAfterThis = $employee->emp_total_taken + $totalDays;
-        if ($totalTakenAfterThis > $employee->emp_total_leaves) {
+        $totalLeaveTaken = $employee->emp_total_taken + $totalDays;
+        $employeeName = $user->name;        
+        
+        if ($totalLeaveTaken > $employee->emp_total_leaves) {
             $aiDecision = 'Rejected';
-            $aiWhy = 'Employee has exceeded allowed leave limit.';
+            $decisionReson = $employeeName . ' you have already used all your allowed leaves.';
         } else {
             try {
                 $response = Http::withHeaders([
@@ -170,15 +173,18 @@ class EmpolyeeController extends Controller
 
                 $json = json_decode($reply, true);
                 if (json_last_error() === JSON_ERROR_NONE && isset($json['decision'])) {
+
                     $aiDecision = in_array($json['decision'], ['Approved', 'Rejected']) ? $json['decision'] : 'Pending';
-                    $aiWhy = $json['why'] ?? null;
+                    $decisionReson = $json['why'] ?? null;
+
                 } else {
+
                     if (stripos($reply, 'approve') !== false) {
                         $aiDecision = 'Approved';
                     } elseif (stripos($reply, 'reject') !== false) {
                         $aiDecision = 'Rejected';
                     }
-                    $aiWhy = $reply;
+                    $decisionReson = $reply;
                 }
             } catch (\Exception $e) {
                 return back()->withErrors(['Status' => 'AI API Error: ' . $e->getMessage()]);
@@ -200,8 +206,10 @@ class EmpolyeeController extends Controller
             $employee->save();
         }
 
+        
+
         return redirect()->route('employee.leaves.request.form')
-            ->with('Status', "Leave Request Submitted. AI Decision: {$aiDecision}");
+            ->with('Status', "Leave Request Submitted. AI Decision: {$aiDecision} : {$decisionReson} ");
     }
 
 

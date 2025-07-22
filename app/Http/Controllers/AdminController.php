@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Employee;
+use App\Models\Leave;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 
 
@@ -13,8 +16,11 @@ class AdminController extends Controller
 {
     public function admin_index()
     {
-        $totalUsers = User::count(); // better naming
-        return view('admin.index', compact('totalUsers'));
+
+        $totalUsers = User::count();
+        $totalEmployee = Employee::count();
+        $leaves = Leave::orderby('created_at', 'desc')->paginate(7);
+        return view('admin.index', compact('totalUsers', 'totalEmployee', 'leaves'));
     }
 
     // All Users    
@@ -24,11 +30,6 @@ class AdminController extends Controller
         return view('admin.users.user', compact('users'));
     }
 
-    // All Leave requests
-    public function admin_all_leaves_requests()
-    {
-        return view('admin.leaves.leave_request');
-    }
 
     // Employee Management
     // All Employees
@@ -161,5 +162,144 @@ class AdminController extends Controller
         return redirect()->route('admin.all_employees')->with('success', 'Employee and User deleted successfully.');
     }
 
-    
+
+    // All Leave requests
+    public function admin_all_leaves_requests()
+    {
+        $user = Auth::user();
+        $leaves = Leave::with('user')->orderBy('created_at', 'desc')->paginate(10);
+        return view('admin.leaves.leave_request', compact('leaves',));
+    }
+
+    // public function admin_leave_edit(Request $request, $id)
+    // {
+    //     $request->validate([
+    //         'status' => 'required|in:Pending,Approved,Rejected',
+    //     ]);
+
+    //     $leave = Leave::find($id);
+
+    //     $OldStatus = $leave->status;
+    //     $NewleaveStatus = $request->status;
+
+    //     $leave->status = $NewleaveStatus;
+    //     $leave->save();
+
+
+    //     $employee = Employee::where('user_id', $leave->user_id)->first();
+    //     if (!$employee) {
+    //         return redirect()->back()->with('Status', 'Employee not found for this leave request.');
+    //     }
+
+
+    //     $from = Carbon::parse($leave->from_date);
+    //     $to = Carbon::parse($leave->to_date);
+    //     $days = $from->diffInDays($to) + 1;
+
+    //     if ($OldStatus === 'Approved' && $NewleaveStatus === 'Rejected') {
+
+    //         $employee->emp_total_taken -= $days;
+    //         $employee->emp_total_leaves += $days;
+    //     }
+
+    //     if ($OldStatus === 'Rejected' && $NewleaveStatus === 'Approved') {
+
+    //         $employee->emp_total_taken += $days;
+    //         $employee->emp_total_leaves -= $days;
+    //     }
+
+    //     if ($OldStatus === 'Pending' && $NewleaveStatus === 'Approved') {
+
+    //         $employee->emp_total_taken += $days;
+    //         $employee->emp_total_leaves -= $days;
+    //     }
+
+    //     if ($OldStatus === 'Pending' && $NewleaveStatus === 'Rejected') {
+
+    //         $employee->emp_total_leaves += $days;
+    //         $employee->emp_total_taken -= $days;
+    //     }
+    //       if ($OldStatus === 'Approved' && $NewleaveStatus === 'Pending') {
+
+    //         $employee->emp_total_taken -= $days;
+    //         $employee->emp_total_leaves += $days;
+    //     }
+
+    //     if ($OldStatus === 'Rejected' && $NewleaveStatus === 'Pending') {
+
+    //         $employee->emp_total_taken = $days;
+    //         $employee->emp_total_leaves = $days;
+    //     }
+
+
+
+    //     $employee->save();
+
+    //     return back()->with('Status', 'Leave status updated and leave counts adjusted successfully.');
+    // }
+
+
+
+    public function admin_leave_edit(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:Pending,Approved,Rejected',
+        ]);
+
+        $leave = Leave::find($id);
+        $employee = Employee::where('user_id', $leave->user_id)->first();
+        if (!$employee) {
+            return redirect()->back()->with('Status', 'Employee not found for this leave request.');
+        }
+
+        $oldStatus = $leave->status;
+        $newStatus = $request->status;
+
+        $form = Carbon::parse($leave->form_date);
+        $to = Carbon::parse($leave->to_date);
+        $totalDays = $form->diffInDays($to) - 1;
+
+        if ($newStatus === 'Approved' && $oldStatus !== 'Approved') {
+
+            $remainingLeaves = $employee->emp_total_leaves - $employee->emp_total_taken;
+
+            if ($remainingLeaves < $totalDays) {
+                return back()->with('Status', 'Leave cannot be approved. Not enough remaining leaves.');
+            }
+
+            $employee->emp_total_taken += $totalDays;
+            $employee->emp_total_leaves -= $totalDays;
+        }
+
+        if ($oldStatus === 'Approved' && $newStatus === 'Rejected') {
+            $employee->emp_total_leaves += $totalDays;
+            $employee->emp_total_taken  -= $totalDays;
+        }
+
+        if ($oldStatus === 'Approved' && $newStatus === 'Pending') {
+            $employee->emp_total_taken -= $totalDays;
+            $employee->emp_total_leaves += $totalDays;
+        }
+
+        if ($oldStatus === 'Rejected' && $newStatus === 'Approved') {
+            $remainingLeaves = $employee->emp_total_leaves - $employee->emp_total_taken;
+
+            if ($remainingLeaves < $totalDays) {
+                return back()->with('Status', 'Leave cannot be approved. Not enough remaining leaves.');
+            }
+        }
+
+        $leave->status = $newStatus;
+        $leave->save();
+        $employee->save();
+
+        return back()->with('Status', 'Leave status updated and leave counts adjusted successfully.');
+    }
+
+    public function admin_leave_delete($id)
+    {
+        $leave = Leave::find($id);
+        $leave->delete();
+        return redirect()->route('admin.leave_request')->with('success', 'Leave request deleted successfully.');
+    }
 }

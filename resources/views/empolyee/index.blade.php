@@ -16,7 +16,7 @@
                                 <div>
                                     <div class="body-text mb-2">All Leaves</div>
 
-                                    <h4>{{ $employee->emp_total_leaves }}</h4>
+                                    <h4>{{ round($employee->emp_total_leaves)  }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -60,7 +60,7 @@
                                     <i class="fa-solid fa-users"></i>
                                 </div>
                                 <div>
-                                    <div class="body-text mb-2">Leaves Taken <h4>{{ $employee->emp_total_taken }}</h4>
+                                    <div class="body-text mb-2">Leaves Taken <h4>{{ round($employee->emp_total_taken ) }}</h4>
                                     </div>
 
                                 </div>

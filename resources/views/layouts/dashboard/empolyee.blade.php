@@ -399,9 +399,6 @@
                         @yield('content')
 
 
-                        <div class="bottom-page">
-                            <div class="body-text">Copyright © 2024 Smart Leave Mangement System</div>
-                        </div>
                     </div>
 
                 </div>
