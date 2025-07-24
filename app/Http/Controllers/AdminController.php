@@ -39,7 +39,7 @@ class AdminController extends Controller
         return view('admin.employee.all_employees', compact('Employees'));
     }
 
-    // Adding a new employee Form
+    // Adding a new employee form
     public function admin_employee_add()
     {
         return view('admin.employee.add_employee');
@@ -89,14 +89,14 @@ class AdminController extends Controller
         return redirect()->route('admin.all_employees')->with('Status', 'Employee Has Been Added successfully');
     }
 
-    // Editing an employee Form 
+    // Editing a employee form 
     public function admin_employee_edit($id)
     {
         $employee = Employee::with('user')->findOrFail($id);
         return view('admin.employee.edit_employee', compact('employee'));
     }
 
-    // Updating an employeea and user
+    // Updating a employeea and user
     public function admin_employee_update(Request $request)
     {
         $request->validate([
@@ -148,7 +148,7 @@ class AdminController extends Controller
         return redirect()->route('admin.all_employees')->with('Status', 'Employee and User updated successfully.');
     }
 
-    // Deleting an employee and User
+    // Deleting a employee and User
     public function admin_employee_delete($id)
     {
         $employee = Employee::find($id);
@@ -187,9 +187,9 @@ class AdminController extends Controller
         $oldStatus = $leave->status;
         $newStatus = $request->status;
 
-        $Form = Carbon::parse($leave->Form_date);
+        $from = Carbon::parse($leave->from_date);
         $to = Carbon::parse($leave->to_date);
-        $totalDays = $Form->diffInDays($to) + 1;
+        $totalDays = $from->diffInDays($to) + 1;
 
         $originalLeaves = $employee->emp_total_leaves + $employee->emp_total_taken;
         $orginalTakenLeaves = $employee->emp_total_taken;
@@ -203,7 +203,6 @@ class AdminController extends Controller
         //     "Remaining  :   " . $remainingLeaves,
 
         // );
-
 
         if ($oldStatus === 'Approved' && $newStatus === 'Rejected') {
 
@@ -244,52 +243,6 @@ class AdminController extends Controller
         }
 
 
-
-
-
-
-
-
-
-        // if ($newStatus === 'Approved' && $oldStatus !== 'Approved') {
-
-        //     $remainingLeaves = $employee->emp_total_leaves - $employee->emp_total_taken;
-
-        //     if ($remainingLeaves < $totalDays) {
-        //         return back()->with('Status', 'Leave cannot be approved. Not enough remaining leaves.');
-        //     }
-
-        //     $employee->emp_total_taken  = max(0, $employee->emp_total_taken + $totalDays);
-        //     $employee->emp_total_leaves  = max(0, $employee->emp_total_leaves - $totalDays);
-        // }
-
-        // if ($oldStatus === 'Approved' && $newStatus === 'Rejected') {
-
-        //     $employee->emp_total_taken  = max(0, $employee->emp_total_taken - $totalDays);
-        //     $employee->emp_total_leaves  = min( $originalLeaves, $employee->emp_total_leaves + $totalDays);
-        // }
-
-        // if ($oldStatus === 'Approved' && $newStatus === 'Pending') {
-
-        //     $employee->emp_total_taken  = max(0, $employee->emp_total_taken - $totalDays);
-        //     $employee->emp_total_leaves  = min( $originalLeaves, $employee->emp_total_leaves + $totalDays);
-        // }
-
-        // if ($oldStatus === 'Rejected' && $newStatus === 'Approved') {
-
-        //     $remainingLeaves = max(0,$employee->emp_total_leaves - $employee->emp_total_taken);
-
-        //     dd("Employee Total Taken Leaves : " . $employee->emp_total_taken  ,  "Employee Total  Leaves : " . $employee->emp_total_leaves, "Employee Total Days For Leaves : " . $totalDays, "Employee Remaing Leaves :" . $remainingLeaves);  
-        //     if ($remainingLeaves < $totalDays) {
-        //         return back()->with('Status', 'Leave cannot be approved. Not enough remaining leaves.');
-        //     }
-
-
-
-        //     $employee->emp_total_taken  = max(0, $employee->emp_total_taken + $totalDays);
-        //     $employee->emp_total_leaves  = max(0, $employee->emp_total_leaves - $totalDays);
-
-        // }
 
         $leave->status = $newStatus;
         $leave->save();
