@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class EmpolyeeController extends Controller
 {
@@ -197,6 +198,7 @@ class EmpolyeeController extends Controller
         $leave->Reason     = $request->Reason;
         $leave->from_date  = $from;
         $leave->to_date    = $to;
+        $leave->total_days= $totalDays ;
         $leave->status     = $aiDecision;
         $leave->save();
 
@@ -209,7 +211,7 @@ class EmpolyeeController extends Controller
         
 
         return redirect()->route('employee.leaves.request.form')
-            ->with('Status', "Leave Request Submitted. AI Decision: {$aiDecision} : {$decisionReson} ");
+            ->with('Status', "Leave Request Submitted. AI Decision: {$aiDecision}");
     }
 
 

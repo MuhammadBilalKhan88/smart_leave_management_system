@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('Reason');
             $table->date('from_date');
             $table->date('to_date');
+            $table->int('Total_days_Lev')->nullable();
             $table->string('status')->default('pending');
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

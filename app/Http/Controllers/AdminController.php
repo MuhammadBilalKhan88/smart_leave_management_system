@@ -39,7 +39,7 @@ class AdminController extends Controller
         return view('admin.employee.all_employees', compact('Employees'));
     }
 
-    // Adding a new employee form
+    // Adding a new employee Form
     public function admin_employee_add()
     {
         return view('admin.employee.add_employee');
@@ -89,7 +89,7 @@ class AdminController extends Controller
         return redirect()->route('admin.all_employees')->with('Status', 'Employee Has Been Added successfully');
     }
 
-    // Editing an employee form 
+    // Editing an employee Form 
     public function admin_employee_edit($id)
     {
         $employee = Employee::with('user')->findOrFail($id);
@@ -171,80 +171,12 @@ class AdminController extends Controller
         return view('admin.leaves.leave_request', compact('leaves',));
     }
 
-    // public function admin_leave_edit(Request $request, $id)
-    // {
-    //     $request->validate([
-    //         'status' => 'required|in:Pending,Approved,Rejected',
-    //     ]);
-
-    //     $leave = Leave::find($id);
-
-    //     $OldStatus = $leave->status;
-    //     $NewleaveStatus = $request->status;
-
-    //     $leave->status = $NewleaveStatus;
-    //     $leave->save();
-
-
-    //     $employee = Employee::where('user_id', $leave->user_id)->first();
-    //     if (!$employee) {
-    //         return redirect()->back()->with('Status', 'Employee not found for this leave request.');
-    //     }
-
-
-    //     $from = Carbon::parse($leave->from_date);
-    //     $to = Carbon::parse($leave->to_date);
-    //     $days = $from->diffInDays($to) + 1;
-
-    //     if ($OldStatus === 'Approved' && $NewleaveStatus === 'Rejected') {
-
-    //         $employee->emp_total_taken -= $days;
-    //         $employee->emp_total_leaves += $days;
-    //     }
-
-    //     if ($OldStatus === 'Rejected' && $NewleaveStatus === 'Approved') {
-
-    //         $employee->emp_total_taken += $days;
-    //         $employee->emp_total_leaves -= $days;
-    //     }
-
-    //     if ($OldStatus === 'Pending' && $NewleaveStatus === 'Approved') {
-
-    //         $employee->emp_total_taken += $days;
-    //         $employee->emp_total_leaves -= $days;
-    //     }
-
-    //     if ($OldStatus === 'Pending' && $NewleaveStatus === 'Rejected') {
-
-    //         $employee->emp_total_leaves += $days;
-    //         $employee->emp_total_taken -= $days;
-    //     }
-    //       if ($OldStatus === 'Approved' && $NewleaveStatus === 'Pending') {
-
-    //         $employee->emp_total_taken -= $days;
-    //         $employee->emp_total_leaves += $days;
-    //     }
-
-    //     if ($OldStatus === 'Rejected' && $NewleaveStatus === 'Pending') {
-
-    //         $employee->emp_total_taken = $days;
-    //         $employee->emp_total_leaves = $days;
-    //     }
-
-
-
-    //     $employee->save();
-
-    //     return back()->with('Status', 'Leave status updated and leave counts adjusted successfully.');
-    // }
-
-
-
     public function admin_leave_edit(Request $request, $id)
     {
         $request->validate([
             'status' => 'required|in:Pending,Approved,Rejected',
         ]);
+
 
         $leave = Leave::find($id);
         $employee = Employee::where('user_id', $leave->user_id)->first();
@@ -255,39 +187,109 @@ class AdminController extends Controller
         $oldStatus = $leave->status;
         $newStatus = $request->status;
 
-        $form = Carbon::parse($leave->form_date);
+        $Form = Carbon::parse($leave->Form_date);
         $to = Carbon::parse($leave->to_date);
-        $totalDays = $form->diffInDays($to) - 1;
+        $totalDays = $Form->diffInDays($to) + 1;
 
-        if ($newStatus === 'Approved' && $oldStatus !== 'Approved') {
+        $originalLeaves = $employee->emp_total_leaves + $employee->emp_total_taken;
+        $orginalTakenLeaves = $employee->emp_total_taken;
 
-            $remainingLeaves = $employee->emp_total_leaves - $employee->emp_total_taken;
+        $remainingLeaves = max(0, min($originalLeaves, $employee->emp_total_leaves));
+        // dd(
+        //     "Employee Total Leaves  :   " . $employee->emp_total_leaves,
+        //     "Employee Total Taken Leaves  :   " . $employee->emp_total_taken,
+        //     "Orginal Leaves  :   " . $originalLeaves,
+        //     "Orginal  Taken Leaves  :   " . $orginalTakenLeaves,
+        //     "Remaining  :   " . $remainingLeaves,
 
-            if ($remainingLeaves < $totalDays) {
-                return back()->with('Status', 'Leave cannot be approved. Not enough remaining leaves.');
-            }
+        // );
 
-            $employee->emp_total_taken += $totalDays;
-            $employee->emp_total_leaves -= $totalDays;
-        }
 
         if ($oldStatus === 'Approved' && $newStatus === 'Rejected') {
-            $employee->emp_total_leaves += $totalDays;
-            $employee->emp_total_taken  -= $totalDays;
-        }
 
-        if ($oldStatus === 'Approved' && $newStatus === 'Pending') {
-            $employee->emp_total_taken -= $totalDays;
-            $employee->emp_total_leaves += $totalDays;
-        }
 
-        if ($oldStatus === 'Rejected' && $newStatus === 'Approved') {
-            $remainingLeaves = $employee->emp_total_leaves - $employee->emp_total_taken;
+            $employee->emp_total_leaves = max(0, min($originalLeaves, $employee->emp_total_leaves + $totalDays));
+            $employee->emp_total_taken = max(0, min($originalLeaves, $employee->emp_total_taken - $totalDays));
 
-            if ($remainingLeaves < $totalDays) {
-                return back()->with('Status', 'Leave cannot be approved. Not enough remaining leaves.');
+            if ($employee->emp_total_leaves < 0 || $employee->emp_total_taken < 0) {
+                return back()->with('Status', 'Leave cannot be rejected. Not enough remaining leaves.');
             }
+
         }
+
+        if ($oldStatus === 'Rejected'  && $newStatus === 'Approved') {
+         
+            $employee->emp_total_taken = max(0,min($employee->emp_total_leaves, $employee->emp_total_taken + $totalDays));
+            $employee->emp_total_leaves = max(0,min($employee->emp_total_leaves, $employee->emp_total_leaves - $totalDays));
+
+             if ($employee->emp_total_leaves < 0 || $employee->emp_total_taken < 0) {
+                return back()->with('Status', 'Leave cannot be Approved. Not enough remaining leaves.');
+            }
+           
+        }
+
+        if($oldStatus === 'Approved' && $newStatus === 'Pending') {
+
+            $employee->emp_total_leaves = max(0, $employee->emp_total_leaves, $employee->emp_total_leaves + $totalDays);
+            $employee->emp_total_taken = max(0, min($employee->emp_total_leaves, $employee->emp_total_taken - $totalDays));
+          
+        }
+        if($oldStatus === 'Pending' && $newStatus === 'Approved') {
+
+            $employee->emp_total_taken = max(0, min($employee->emp_total_leaves, $employee->emp_total_taken + $totalDays));
+            $employee->emp_total_leaves = max(0, min($employee->emp_total_leaves, $employee->emp_total_leaves - $totalDays));
+
+
+          
+        }
+
+
+
+
+
+
+
+
+
+        // if ($newStatus === 'Approved' && $oldStatus !== 'Approved') {
+
+        //     $remainingLeaves = $employee->emp_total_leaves - $employee->emp_total_taken;
+
+        //     if ($remainingLeaves < $totalDays) {
+        //         return back()->with('Status', 'Leave cannot be approved. Not enough remaining leaves.');
+        //     }
+
+        //     $employee->emp_total_taken  = max(0, $employee->emp_total_taken + $totalDays);
+        //     $employee->emp_total_leaves  = max(0, $employee->emp_total_leaves - $totalDays);
+        // }
+
+        // if ($oldStatus === 'Approved' && $newStatus === 'Rejected') {
+
+        //     $employee->emp_total_taken  = max(0, $employee->emp_total_taken - $totalDays);
+        //     $employee->emp_total_leaves  = min( $originalLeaves, $employee->emp_total_leaves + $totalDays);
+        // }
+
+        // if ($oldStatus === 'Approved' && $newStatus === 'Pending') {
+
+        //     $employee->emp_total_taken  = max(0, $employee->emp_total_taken - $totalDays);
+        //     $employee->emp_total_leaves  = min( $originalLeaves, $employee->emp_total_leaves + $totalDays);
+        // }
+
+        // if ($oldStatus === 'Rejected' && $newStatus === 'Approved') {
+
+        //     $remainingLeaves = max(0,$employee->emp_total_leaves - $employee->emp_total_taken);
+
+        //     dd("Employee Total Taken Leaves : " . $employee->emp_total_taken  ,  "Employee Total  Leaves : " . $employee->emp_total_leaves, "Employee Total Days For Leaves : " . $totalDays, "Employee Remaing Leaves :" . $remainingLeaves);  
+        //     if ($remainingLeaves < $totalDays) {
+        //         return back()->with('Status', 'Leave cannot be approved. Not enough remaining leaves.');
+        //     }
+
+
+
+        //     $employee->emp_total_taken  = max(0, $employee->emp_total_taken + $totalDays);
+        //     $employee->emp_total_leaves  = max(0, $employee->emp_total_leaves - $totalDays);
+
+        // }
 
         $leave->status = $newStatus;
         $leave->save();

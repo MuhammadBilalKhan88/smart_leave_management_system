@@ -26,24 +26,29 @@
 
             <!-- new-category -->
             <div class="wg-box">
+
                 @if (session('Status'))
 
-                    @if (session('Status') === 'Leave Approved')
+                    @php
+                        $status = session('Status');
+                    @endphp
 
+                    @if (Str::contains($status, 'Approved'))
                         <div class="alert alert-success">
-                            <h5>{{ session('Status') }}</h5>
+                            <h5>{{ $status }}</h5>
                         </div>
-
-                    @elseif (session('Status') === 'Leave Rejected')
-
+                    @elseif (Str::contains($status, 'Rejected'))
                         <div class="alert alert-danger">
-                            <h5>{{ session('Status') }}</h5>
+                            <h5>{{ $status }}</h5>
                         </div>
-
-
-                  
+                    @else
+                        <div class="alert alert-warning">
+                            <h5>{{ $status }}</h5>
+                        </div>
                     @endif
+
                 @endif
+
 
 
                 <form class="form-new-employee form-style-1" action="{{ route('employee.leaves.request.store') }}"

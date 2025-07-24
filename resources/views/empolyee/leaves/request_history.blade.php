@@ -46,6 +46,7 @@
                                     <th>Reason</th>
                                     <th>From Date</th>
                                     <th>To Date</th>
+                                    <th>Total Days</th>
                                     <th>Status</th>
                                     <th>AI Feedback</th>
                                     <th>Applied On</th>
@@ -57,7 +58,7 @@
                     <td>{{ $leave->leave_type }}</td>
                     <td>{{ $leave->Reason }}</td>
                     <td>{{ $leave->from_date }}</td>
-                    <td>{{ $leave->to_date }}</td>
+                    <td>{{ $leave->total_days }}</td>
                     <td>
                         @if($leave->status === 'Approved')
                             <span class="badge bg-success">Approved</span>
@@ -67,7 +68,8 @@
                             <span class="badge bg-warning text-dark">Pending</span>
                         @endif
                     </td>
-                    <td>{{ $leave->status ?? 'N/A' }}</td>
+               
+                    <td>{{ $leave->Total_days_Lev }}</td>
                     <td>{{ $leave->created_at->format('d-m-Y') }}</td>
                 </tr>
                                 @endforeach

@@ -35,6 +35,11 @@
                     <a class="tf-button style-1 w208" href="{{ route('employee.leaves.request.form') }}"><i
                             class="icon-plus"></i>Leave Request</a>
                 </div>
+                @if(session('Status'))
+                    <div class="alert alert-success">
+                        {{ session('Status') }}
+                    </div>
+                @endif    
                 <div class="wg-table table-all-user">
                     <div class="table-responsive">
 
@@ -49,6 +54,7 @@
                                     <th>Reason</th>
                                     <th>From Date</th>
                                     <th>To Date</th>
+                                    <th>Total Days</th>
                                     <th>Status</th>
                                     <th>AI Feedback</th>
                                     <th>Applied On</th>
@@ -65,21 +71,51 @@
                                         <td>{{ $leave->Reason }}</td>
                                         <td>{{ $leave->from_date }}</td>
                                         <td>{{ $leave->to_date }}</td>
-                                        <td>
-                                            <form action="{{ route('admin.leave.edit', $leave->id) }}" method="POST">
-                                                @csrf
-                                                @method('PUT')
+                                        <td>{{ $leave->total_days }}</td>
+                                           <td>
+                                                @php
+                                                    $statusClass = match($leave->status) {
+                                                        'Approved' => 'btn-success',
+                                                        'Rejected' => 'btn-danger',
+                                                        'Pending'  => 'btn-warning',
+                                                        default    => 'btn-primary'
+                                                    };
+                                                @endphp
 
-                                                <select name="status" onchange="this.form.submit()" class="form-control">
-                                                    <option value="Pending" {{ $leave->status == 'Pending' ? 'selected' : '' }}>
-                                                        Pending</option>
-                                                    <option value="Approved" {{ $leave->status == 'Approved' ? 'selected' : '' }}>
-                                                        Approved</option>
-                                                    <option value="Rejected" {{ $leave->status == 'Rejected' ? 'selected' : '' }}>
-                                                        Rejected</option>
-                                                </select>
-                                            </form>
-                                        </td>
+                                                <form action="{{ route('admin.leave.edit', $leave->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+
+                                                    <div class="dropdown">
+
+                                                        <button class="btn btn-md   dropdown-toggle  {{ $statusClass }}"
+                                                            type="button" data-bs-toggle="dropdown">
+                                                            {{ $leave->status }}
+                                                        </button>
+
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <button class="dropdown-item btn btn-md btn-success" type="submit"
+                                                                    name="status" value="Approved" {{ $leave->status == 'Approved' ? 'disabled' : '' }}>
+                                                                    Approve
+                                                                </button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="dropdown-item btn btn-md btn-danger" type="submit"
+                                                                    name="status" value="Rejected" {{ $leave->status == 'Rejected' ? 'disabled' : '' }}>
+                                                                    Reject
+                                                                </button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="dropdown-item btn btn-md btn-warning" type="submit"
+                                                                    name="status" value="Pending" {{ $leave->status == 'Pending' ? 'disabled' : '' }}>
+                                                                    Pending
+                                                                </button>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </form>
+                                            </td>
                                         <td>{{ $leave->status ?? 'N/A' }}</td>
                                         <td>{{ $leave->created_at->format('d-m-Y') }}</td>
                                         <td>

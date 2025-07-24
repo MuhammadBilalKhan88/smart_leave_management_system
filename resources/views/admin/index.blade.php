@@ -53,6 +53,11 @@
             <div class="tf-section mb-30">
 
                 <div class="wg-box">
+                    @if(session('Status'))
+                        <div class="alert alert-success">
+                            {{ session('Status') }}
+                        </div>
+                    @endif    
                     <div class="flex items-center justify-between">
                         <h5>Recent Leave Request</h5>
                         <div class="dropdown default">
@@ -74,6 +79,7 @@
                                         <th>Reason</th>
                                         <th>From Date</th>
                                         <th>To Date</th>
+                                        <th>Total Days</th>
                                         <th>Status</th>
                                         <th>AI Feedback</th>
                                         <th>Applied On</th>
@@ -90,6 +96,7 @@
                                             <td>{{ $leave->Reason }}</td>
                                             <td>{{ $leave->from_date }}</td>
                                             <td>{{ $leave->to_date }}</td>
+                                            <td>{{ $leave->total_days }}</td>
                                             <td>
                                                 @php
                                                     $statusClass = match($leave->status) {

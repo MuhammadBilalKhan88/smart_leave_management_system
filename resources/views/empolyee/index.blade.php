@@ -16,7 +16,7 @@
                                 <div>
                                     <div class="body-text mb-2">All Leaves</div>
 
-                                    <h4>{{ round($employee->emp_total_leaves)  }}</h4>
+                                    <h4>{{ round( max(0,$employee->emp_total_leaves) )  }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -60,7 +60,7 @@
                                     <i class="fa-solid fa-users"></i>
                                 </div>
                                 <div>
-                                    <div class="body-text mb-2">Leaves Taken <h4>{{ round($employee->emp_total_taken ) }}</h4>
+                                    <div class="body-text mb-2">Leaves Taken <h4>{{ round( max(0,$employee->emp_total_taken )) }}</h4>
                                     </div>
 
                                 </div>
@@ -123,6 +123,7 @@
                                     <th>Reason</th>
                                     <th>From Date</th>
                                     <th>To Date</th>
+                                    <th>Total Days</th>
                                     <th>Status</th>
                                     <th>AI Feedback</th>
                                     <th>Applied On</th>
@@ -135,6 +136,7 @@
                     <td>{{ $leave->Reason }}</td>
                     <td>{{ $leave->from_date }}</td>
                     <td>{{ $leave->to_date }}</td>
+                    <td>{{ $leave->total_days }}</td>
                     <td>
                         @if($leave->status === 'Approved')
                             <span class="badge bg-success">Approved</span>
