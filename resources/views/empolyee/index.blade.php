@@ -132,6 +132,7 @@
                             <tbody>
                                 @foreach ($leaves as $leave)
                                       <tr>
+                                        
                     <td>{{ $leave->leave_type }}</td>
                     <td>{{ $leave->Reason }}</td>
                     <td>{{ $leave->from_date }}</td>

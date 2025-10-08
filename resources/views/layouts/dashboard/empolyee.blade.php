@@ -21,6 +21,7 @@
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     @stack('style')
+
 </head>
 
 <body class="body">
@@ -36,26 +37,23 @@
 
                 <div class="section-menu-left">
                     <div class="box-logo">
-                        <a href="{{ route('index') }}" id="site-logo-inner">
-                            {{-- <img class="" id="logo_header" alt=""
-                                src="{{ asset('dashboard/images/logo/logo.png') }}"
-                                data-light="{{ asset('dashboard/images/logo/logo.png') }}"
-                                data-dark="{{ asset('dashboard/images/logo/logo.png') }}"> --}}
-                               <h6>Smart Leave Mangement System</h6>
+                           <a href="{{ route('admin.index') }}" id="site-logo-inner">
+                             {{-- <img class="" id="logo_header" alt="" src="{{ asset('images/logo.png')}}"
+                                data-light="{{ asset('images/logo.png')}}" data-dark="{{ asset('images/logo.png')}}">  --}}
+                             <h6>Smart LMS</h6> 
                         </a>
-                        <div class="button-show-hide">
-                            <i class="icon-menu-left"></i>
-                        </div>
                     </div>
                     <div class="center">
                         <div class="center-item">
                             <div class="center-heading">Main Home</div>
                             <ul class="menu-list">
                                 <li class="menu-item">
-                                    <a href="{{ route('index') }}" class="">
+                                    <li class="menu-item">
+                                    <a href="{{ route('admin.index') }}" class="">
                                         <div class="icon"><i class="icon-grid"></i></div>
                                         <div class="text">Dashboard</div>
                                     </a>
+                                </li>
                                 </li>
                             </ul>
                         </div>
@@ -83,11 +81,18 @@
 
                                     </ul>
                                 </li>
+                                <li class="menu-item ">
+                                    <a href="{{ route('index') }}">
+                                        <div class="icon"> <i class="fas fa-home"></i></div>
+                                        <div class="text">Go To Home</div>
+                                    </a>
+                                </li>
 
                                 <li class="menu-item ">
                                     <form action="{{ route('logout') }}" id="logout-form" method="POST">
                                         @csrf
-                                        <a onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="cursor: pointer;">
+                                        <a onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                                            style="cursor: pointer;">
                                             <div class="icon"> <i class="fas fa-door-open"></i>
                                             </div>
                                             <div class="text">Logout</div>
@@ -109,8 +114,7 @@
                                         src="{{ asset('dashboard/images/logo/logo.png') }}"
                                         data-light="{{ asset('dashboard/images/logo/logo.png') }}"
                                         data-dark="{{ asset('dashboard/images/logo/logo.png') }}" data-width="154px"
-                                        data-height="52px"
-                                        data-retina="{{ asset('dashboard/images/logo/logo.png') }}">
+                                        data-height="52px" data-retina="{{ asset('dashboard/images/logo/logo.png') }}">
                                 </a>
                                 <div class="button-show-hide">
                                     <i class="icon-menu-left"></i>
@@ -119,9 +123,8 @@
 
                                 <form class="form-search flex-grow">
                                     <fieldset class="name">
-                                        <input type="text" placeholder="Search here..." class="show-search"
-                                            name="name" tabindex="2" value="" aria-required="true"
-                                            required="">
+                                        <input type="text" placeholder="Search here..." class="show-search" name="name"
+                                            tabindex="2" value="" aria-required="true" required="">
                                     </fieldset>
                                     <div class="button-submit">
                                         <button class="" type="submit"><i class="icon-search"></i></button>
@@ -333,8 +336,7 @@
                                             id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="header-user wg-user">
                                                 <span class="image">
-                                                    <img src="{{ asset('dashboard/images/avatar/user-1.png') }}"
-                                                        alt="">
+                                                    <img src="{{ asset('dashboard/images/avatar/user-1.png') }}" alt="">
                                                 </span>
                                                 <span class="flex flex-column">
                                                     <span class="body-title mb-2">{{ Auth::user()->name }}</span>
@@ -415,35 +417,35 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        (function($) {
+        (function ($) {
 
-            var tfLineChart = (function() {
+            var tfLineChart = (function () {
 
-                var chartBar = function() {
+                var chartBar = function () {
 
                     var options = {
                         series: [{
-                                name: 'Total',
-                                data: [0.00, 0.00, 0.00, 0.00, 0.00, 273.22, 208.12, 0.00, 0.00,
-                                    0.00, 0.00, 0.00
-                                ]
-                            }, {
-                                name: 'Pending',
-                                data: [0.00, 0.00, 0.00, 0.00, 0.00, 273.22, 208.12, 0.00, 0.00,
-                                    0.00, 0.00, 0.00
-                                ]
-                            },
-                            {
-                                name: 'Delivered',
-                                data: [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
-                                    0.00, 0.00
-                                ]
-                            }, {
-                                name: 'Canceled',
-                                data: [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
-                                    0.00, 0.00
-                                ]
-                            }
+                            name: 'Total',
+                            data: [0.00, 0.00, 0.00, 0.00, 0.00, 273.22, 208.12, 0.00, 0.00,
+                                0.00, 0.00, 0.00
+                            ]
+                        }, {
+                            name: 'Pending',
+                            data: [0.00, 0.00, 0.00, 0.00, 0.00, 273.22, 208.12, 0.00, 0.00,
+                                0.00, 0.00, 0.00
+                            ]
+                        },
+                        {
+                            name: 'Delivered',
+                            data: [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
+                                0.00, 0.00
+                            ]
+                        }, {
+                            name: 'Canceled',
+                            data: [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
+                                0.00, 0.00
+                            ]
+                        }
                         ],
                         chart: {
                             type: 'bar',
@@ -487,7 +489,7 @@
                         },
                         tooltip: {
                             y: {
-                                formatter: function(val) {
+                                formatter: function (val) {
                                     return "$ " + val + ""
                                 }
                             }
@@ -505,22 +507,22 @@
 
                 /* Function ============ */
                 return {
-                    init: function() {},
+                    init: function () { },
 
-                    load: function() {
+                    load: function () {
                         chartBar();
                     },
-                    resize: function() {},
+                    resize: function () { },
                 };
             })();
 
-            jQuery(document).ready(function() {});
+            jQuery(document).ready(function () { });
 
-            jQuery(window).on("load", function() {
+            jQuery(window).on("load", function () {
                 tfLineChart.load();
             });
 
-            jQuery(window).on("resize", function() {});
+            jQuery(window).on("resize", function () { });
         })(jQuery);
     </script>
     @stack('script')

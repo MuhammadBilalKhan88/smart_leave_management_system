@@ -48,30 +48,39 @@
                                     <th>To Date</th>
                                     <th>Total Days</th>
                                     <th>Status</th>
-                                    <th>AI Feedback</th>
+                                    <th>Ai Reason</th>
+                                    <th>Status</th>
                                     <th>Applied On</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($leaves as $leave)
-                                      <tr>
-                    <td>{{ $leave->leave_type }}</td>
-                    <td>{{ $leave->Reason }}</td>
-                    <td>{{ $leave->from_date }}</td>
-                    <td>{{ $leave->total_days }}</td>
-                    <td>
-                        @if($leave->status === 'Approved')
-                            <span class="badge bg-success">Approved</span>
-                        @elseif($leave->status === 'Rejected')
-                            <span class="badge bg-danger">Rejected</span>
-                        @else
-                            <span class="badge bg-warning text-dark">Pending</span>
-                        @endif
-                    </td>
-               
-                    <td>{{ $leave->Total_days_Lev }}</td>
-                    <td>{{ $leave->created_at->format('d-m-Y') }}</td>
-                </tr>
+                                    <tr>
+                                        <td>{{ $leave->leave_type }}</td>
+                                        <td>{{ $leave->Reason }}</td>
+                                        <td>{{ $leave->from_date }}</td>
+                                        <td>{{ $leave->to_date }}</td>
+                                        <td>{{ $leave->total_days }}</td>
+                                        <td>
+                                            @if($leave->status === 'Approved')
+                                                <span class="badge bg-success">Approved</span>
+                                            @elseif($leave->status === 'Rejected')
+                                                <span class="badge bg-danger">Rejected</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            @endif
+                                        </td>
+
+                                        
+
+                                          <td>{{ $leave->ai_reason ?? 'N/A' }}</td>
+                                          <td>{{ $leave->status ?? 'N/A' }}</td>
+
+
+
+                                       
+                                        <td>{{ $leave->created_at->format('d-m-Y') }}</td>
+                                    </tr>
                                 @endforeach
 
                             </tbody>

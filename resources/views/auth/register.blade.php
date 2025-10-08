@@ -39,7 +39,7 @@
         <div class="register-card">
             <div class="register-header">{{ __('Register an account') }}</div>
 
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="{{ route('admin.register.store') }}">
                 @csrf
 
                 <div class="mb-3">

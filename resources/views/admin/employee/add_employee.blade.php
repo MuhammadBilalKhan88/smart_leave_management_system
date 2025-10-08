@@ -147,7 +147,7 @@
                     <fieldset class="name">
                         <div class="body-title">Total Leaves Allowed <span class="tf-color-1">*</span></div>
                         <input class="form-control" type="number" name="emp_total_leaves"
-                            value="{{ old('emp_total_leaves', 15) }}" required>
+                            value="{{ old('emp_total_leaves') }}" required>
                     </fieldset>
 
                     @error('emp_total_leaves')

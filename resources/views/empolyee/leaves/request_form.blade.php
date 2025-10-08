@@ -26,7 +26,15 @@
 
             <!-- new-category -->
             <div class="wg-box">
-
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
                 @if (session('Status'))
 
                     @php
@@ -49,6 +57,8 @@
 
                 @endif
 
+
+                
 
 
                 <form class="form-new-employee form-style-1" action="{{ route('employee.leaves.request.store') }}"

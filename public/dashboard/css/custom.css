@@ -1,9 +1,37 @@
 body {
-    zoom: 90% !important;
+    zoom: 90% ;
 }
 
 #logo_header_mobile {
-    max-width: 190px;
+    /* max-width: 1/90px; */
+}
+.site-title {
+    margin: 0;
+    padding-left: 10px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+    line-height: 1.2;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.site-title .highlight {
+    color: #2196F3; /* Blue */
+    font-size: 16px;
+    display: block;
+}
+
+.site-title .subtitle {
+    color: #2e3a46; /* Dark Gray */
+    font-size: 14px;
+    display: block;
+}
+
+#logo_header {
+    height: 40px;
+    vertical-align: middle;
+    display: inline-block;
 }
 
 .wg-table.table-all-user>* {

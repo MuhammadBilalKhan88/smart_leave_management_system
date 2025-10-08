@@ -34,173 +34,98 @@ class EmpolyeeController extends Controller
     }
 
 
-    // public function employee_leaves_request_store(Request $request)
-    // {
-    //     $request->validate([
-    //         'leave_type' => 'required',
-    //         'Reason' => 'required|string',
-    //         'from_date' => 'required|date',
-    //         'to_date' => 'required|date|after_or_equal:from_date',
-    //     ]);
 
-    //     $user = Auth::user();
-    //     $employee = Employee::where('user_id', $user->id)->first();
-    //     if (!$employee) {
-    //         return back()->withErrors(['Status' => 'Employee record missing.']);
-    //     }
+public function employee_leaves_request_store(Request $request)
+{
+    $request->validate([
+        'leave_type' => 'required',
+        'Reason' => 'required|string',
+        'from_date' => 'required|date',
+        'to_date' => 'required|date|after_or_equal:from_date',
+    ]);
 
-    //     $from = Carbon::parse($request->from_date);
-    //     $to   = Carbon::parse($request->to_date);
-    //     $totalDays = $from->diffInDays($to) + 1;
+    $user = Auth::user();
+    $employee = Employee::where('user_id', $user->id)->first();
 
+  
+    $alreadyLeave = Leave::where('user_id', $user->id)
+        ->whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
+        ->exists();
 
-    //     $prompt = "Employee ne {$totalDays} din ki chutti maangi hai for reason: {$request->Reason}. " .
-    //         "Total allowed leaves: {$employee->emp_total_leaves}, " .
-    //         "Taken: {$employee->emp_total_taken}. " .
-    //         "Should this be approved or rejected? Please reply only as JSON like " .
-    //         "{\"decision\":\"Approved\"|\"Rejected\",\"why\":\"short reason\"}.";
-
-    //     $aiDecision = 'Pending';
-    //     $aiWhy = null;
-
-    //     try {
-    //         $response = Http::withHeaders([
-    //             'Authorization' => 'Bearer ' . env('COHERE_API_KEY'),
-    //             'Content-Type' => 'application/json',
-    //         ])->post('https://api.cohere.ai/v1/chat', [
-    //             'model' => 'command-r-plus',
-    //             'message' => $prompt,
-    //             'chat_history' => [],
-    //             'temperature' => 0.3,
-    //             'max_tokens' => 100,
-    //         ]);
-
-    //         if (!$response->successful()) {
-    //             return back()->withErrors(['Status' => 'Cohere API Error: ' . $response->status()]);
-    //         }
-
-    //         $reply = $response->json('text') ?? '';
-
-    //         $json = json_decode($reply, true);
-    //         if (json_last_error() === JSON_ERROR_NONE && isset($json['decision'])) {
-    //             $aiDecision = in_array($json['decision'], ['Approved', 'Rejected']) ? $json['decision'] : 'Pending';
-    //             $aiWhy = $json['why'] ?? null;
-    //         } else {
-    //             if (stripos($reply, 'approve') !== false) {
-    //                 $aiDecision = 'Approved';
-    //             } elseif (stripos($reply, 'reject') !== false) {
-    //                 $aiDecision = 'Rejected';
-    //             }
-    //             $aiWhy = $reply;
-    //         }
-    //     } catch (\Exception $e) {
-    //         return back()->withErrors(['Status' => 'AI API Error: ' . $e->getMessage()]);
-    //     }
-
-    //     $leave = new Leave();
-    //     $leave->user_id    = $user->id;
-    //     $leave->leave_type = $request->leave_type;
-    //     $leave->Reason     = $request->Reason;
-    //     $leave->from_date  = $from;
-    //     $leave->to_date    = $to;
-    //     $leave->status     = $aiDecision;
-    //     $leave->save();
-
-    //     if ($aiDecision === 'Approved') {
-    //         $employee->emp_total_taken += $totalDays;
-    //         $employee->save();
-    //     }
-
-    //     return redirect()->route('employee.leaves.request.form')
-    //         ->with('Status', "Leave Request Submitted. AI Decision: {$aiDecision}");
-    // }
-
-
-
-    public function employee_leaves_request_store(Request $request)
-    {
-        $request->validate([
-            'leave_type' => 'required',
-            'Reason' => 'required|string',
-            'from_date' => 'required|date',
-            'to_date' => 'required|date|after_or_equal:from_date',
+    if ($alreadyLeave) {
+        return back()->withErrors([
+            'Status' => 'You can only submit one leave request per month. If there is an issue, please contact the admin. If it is an emergency, please contact the admin directly to request leave.',
         ]);
+    }
 
-        $user = Auth::user();
-        $employee = Employee::where('user_id', $user->id)->first();
-       
+    $from = Carbon::parse($request->from_date);
+    $to   = Carbon::parse($request->to_date);
+    $totalDays = $from->diffInDays($to) + 1;
 
-        $from = Carbon::parse($request->from_date);
-        $to   = Carbon::parse($request->to_date);
-        $totalDays = $from->diffInDays($to) + 1;
+   
+    if ($employee->emp_total_taken + $totalDays > $employee->emp_total_leaves) {
+        return back()->withErrors([
+            'Status' => 'You have exceeded your yearly leave limit. Total allowed: ' . $employee->emp_total_leaves
+        ]);
+    }
 
-        
+ 
+    $aiDecision = 'Pending';
+    $decisionReson = null;
 
-
-
-        $prompt = "The employee has requested {$totalDays} days of leave for the reason: {$request->Reason} " .
-            "Total allowed leaves: {$employee->emp_total_leaves}, " .
+    try {
+        $prompt = "The employee {$user->name} has requested {$totalDays} days of leave for the reason: {$request->Reason}. " .
+            "Annual allowed leaves: {$employee->emp_total_leaves}, " .
             "Already taken: {$employee->emp_total_taken}. " .
             "Should this be approved or rejected? Please reply only as JSON like " .
             "{\"decision\":\"Approved\"|\"Rejected\",\"why\":\"short reason\"}.";
 
-        $aiDecision = 'Pending';
-        $decisionReson = null;
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('OPENROUTER_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://openrouter.ai/api/v1/chat/completions', [
+            'model' => 'deepseek/deepseek-chat-v3.1:free',
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => $prompt,
+                ]
+            ]
+        ]);
 
-        $totalLeaveTaken = $employee->emp_total_taken + $totalDays;
-        $employeeName = $user->name;        
-        
-        if ($totalLeaveTaken > $employee->emp_total_leaves) {
-            $aiDecision = 'Rejected';
-            $decisionReson = $employeeName . ' you have already used all your allowed leaves.';
-        } else {
-            try {
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . env('COHERE_API_KEY'),
-                    'Content-Type' => 'application/json',
-                ])->post('https://api.cohere.ai/v1/chat', [
-                    'model' => 'command-r-plus',
-                    'message' => $prompt,
-                    'chat_history' => [],
-                    'temperature' => 0.3,
-                    'max_tokens' => 100,
-                ]);
+        if ($response->successful()) {
+            $reply = $response->json('choices.0.message.content') ?? '';
+            $json = json_decode($reply, true);
 
-                if (!$response->successful()) {
-                    return back()->withErrors(['Status' => 'Cohere API Error: ' . $response->status()]);
+            if (json_last_error() === JSON_ERROR_NONE && isset($json['decision'])) {
+                $aiDecision = in_array($json['decision'], ['Approved', 'Rejected']) ? $json['decision'] : 'Pending';
+                $decisionReson = $json['why'] ?? null;
+            } else {
+                if (stripos($reply, 'approve') !== false) {
+                    $aiDecision = 'Approved';
+                } elseif (stripos($reply, 'reject') !== false) {
+                    $aiDecision = 'Rejected';
                 }
-
-                $reply = $response->json('text') ?? '';
-
-                $json = json_decode($reply, true);
-                if (json_last_error() === JSON_ERROR_NONE && isset($json['decision'])) {
-
-                    $aiDecision = in_array($json['decision'], ['Approved', 'Rejected']) ? $json['decision'] : 'Pending';
-                    $decisionReson = $json['why'] ?? null;
-
-                } else {
-
-                    if (stripos($reply, 'approve') !== false) {
-                        $aiDecision = 'Approved';
-                    } elseif (stripos($reply, 'reject') !== false) {
-                        $aiDecision = 'Rejected';
-                    }
-                    $decisionReson = $reply;
-                }
-            } catch (\Exception $e) {
-                return back()->withErrors(['Status' => 'AI API Error: ' . $e->getMessage()]);
+                $decisionReson = $reply;
             }
         }
+    } catch (\Exception $e) {
+        return back()->withErrors(['Status' => 'AI API Error: ' . $e->getMessage()]);
+    }
 
-        $leave = new Leave();
-        $leave->user_id    = $user->id;
-        $leave->leave_type = $request->leave_type;
-        $leave->Reason     = $request->Reason;
-        $leave->from_date  = $from;
-        $leave->to_date    = $to;
-        $leave->total_days= $totalDays ;
-        $leave->status     = $aiDecision;
-        $leave->save();
+
+    $leave = new Leave();
+    $leave->user_id    = $user->id;
+    $leave->leave_type = $request->leave_type;
+    $leave->Reason     = $request->Reason;
+    $leave->from_date  = $from;
+    $leave->to_date    = $to;
+    $leave->total_days = $totalDays;
+    $leave->status     = $aiDecision;
+    $leave->ai_reason  = $decisionReson;
+    $leave->save();
+
 
         if ($aiDecision === 'Approved') {
             $employee->emp_total_leaves -= $totalDays;
@@ -208,11 +133,13 @@ class EmpolyeeController extends Controller
             $employee->save();
         }
 
-        
 
-        return redirect()->route('employee.leaves.request.form')
-            ->with('Status', "Leave Request Submitted. AI Decision: {$aiDecision}");
-    }
+    return redirect()->route('employee.leaves.request.form')
+        ->with('Status', "Leave Request Submitted. AI Decision: {$aiDecision}. Reason: {$decisionReson}");
+}
+
+
+
 
 
     public function employee_leaves_request_history()

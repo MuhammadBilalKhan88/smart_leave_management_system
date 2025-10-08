@@ -20,8 +20,7 @@ class LoginController extends Controller
 
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
-        $this->middleware('auth')->only('logout');
+     $this->middleware('guest')->except('logout');
     }
 
     // 👇 Add this method below constructor
@@ -32,7 +31,7 @@ class LoginController extends Controller
 
         } elseif ($user->Utype === 'EMP') {
 
-            return redirect()->route('index');
+            return redirect()->route('emp_index');
         } else {
 
             Auth::logout();

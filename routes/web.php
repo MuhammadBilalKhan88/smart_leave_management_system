@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EmpolyeeController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\contactController;
 use App\Http\Controllers\RegisterUserController;
 use App\Http\Middleware\AuthAdmin;
 use App\Http\Middleware\AuthEmployee;
@@ -14,11 +15,17 @@ use Illuminate\Support\Facades\Auth;
 
 Auth::routes();
 
+Auth::routes([
+    'register' => false, 
+]);
+
 Route::get('/',  [HomeController::class, 'index'])->name('index');
+Route::post('/sumbit',  [contactController::class, 'contactSubmit'])->name('contactSumbitform');
+
 
 Route::middleware(['auth', AuthEmployee::class])->group(function () {
 
-    Route::get('/',  [EmpolyeeController::class, 'index'])->name('index');
+    Route::get('/employedashboard',  [EmpolyeeController::class, 'index'])->name('emp_index');      
     
     Route::get('/leavesForm',  [EmpolyeeController::class, 'employee_leaves_request_form'])->name('employee.leaves.request.form');
     Route::post('/leavesFrom',[EmpolyeeController::class, 'employee_leaves_request_store'])->name('employee.leaves.request.store');
@@ -47,6 +54,7 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
 
     Route::get('/admin/users',  [AdminController::class, 'admin_all_users'])->name('admin.all_users');
     Route::PUt('/admin/users/{id}',  [AdminController::class, 'admin_users_edit'])->name('admin.edit_users');
+    Route::Delete('/admin/users/delete/{id}',  [AdminController::class, 'admin_users_delete'])->name('admin.user.delete');
 
     Route::get('/admin/register', [RegisterUserController::class, 'admin_user_register'])->name('admin.register');
     Route::post('/admin/register', [RegisterUserController::class, 'admin_user_store'])->name('admin.register.store');

@@ -64,12 +64,19 @@
                                                         <i class="icon-edit-3"></i>
                                                     </div>
                                                 </a>
-                                              
-                                                      <button  class="item text-danger delete"
+                                              <form action="{{ route('admin.user.delete', ['id' => $user->id]) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                      <button  type="submit" class="item text-danger delete"
                                                         style="background: none; border: none;">
                                                         <i class="icon-trash-2"></i>
                                                     </button>
                                  
+
+                                                </form>
+                                              
                                             </div>
                                         </td>
                                     </tr>

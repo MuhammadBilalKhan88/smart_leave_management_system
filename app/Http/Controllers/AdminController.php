@@ -31,6 +31,26 @@ class AdminController extends Controller
     }
 
 
+    public function admin_users_delete($id)
+    {
+        $user = User::find($id);
+        
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+
+        $employee = Employee::where('user_id', $user->id)->first();
+        if ($employee) {
+           
+            $employee->delete();
+        }
+
+      
+        $user->delete();
+
+        return redirect()->route('admin.all_users')->with('success', 'User and associated employee record deleted successfully.');
+    }
+
     // Employee Management
     // All Employees
     public function admin_all_employees()
@@ -48,6 +68,7 @@ class AdminController extends Controller
     // Storing a new employee and user
     public function admin_employee_store(Request $request)
     {
+      
         $request->validate([
             'emp_name'          => 'required|string|max:255',
             'emp_email'         => 'required|email|unique:users,email|unique:employees,emp_email',
@@ -58,6 +79,7 @@ class AdminController extends Controller
             'emp_salary'        => 'nullable|numeric|min:0',
             'emp_joining_date'  => 'nullable|date',
             'emp_timing'        => 'required|string|max:255',
+            'emp_total_leaves'        => 'required|int|max:50',
             'password'          => 'required|min:8',
 
         ]);
@@ -84,6 +106,7 @@ class AdminController extends Controller
         $employee->emp_salary = $request->emp_salary;
         $employee->emp_joining_date = $request->emp_joining_date;
         $employee->emp_timing = $request->emp_timing;
+        $employee->emp_total_leaves = $request->emp_total_leaves;
         $employee->user_id = $user->id;
         $employee->save();
         return redirect()->route('admin.all_employees')->with('Status', 'Employee Has Been Added successfully');

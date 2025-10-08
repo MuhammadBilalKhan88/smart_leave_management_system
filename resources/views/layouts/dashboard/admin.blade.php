@@ -38,13 +38,12 @@
                 <div class="section-menu-left">
                     <div class="box-logo">
                            <a href="{{ route('admin.index') }}" id="site-logo-inner">
-                            {{-- <img class="" id="logo_header" alt="" src="{{ asset('dashboard/images/logo/logo.png')}}"
-                                data-light="{{ asset('dashboard/images/logo/logo.png')}}" data-dark="{{ asset('dashboard/images/logo/logo.png')}}"> --}}
-                             <h6>Smart Leave Mangement System</h6>
+                             {{-- <img class="" id="logo_header" alt="" src="{{ asset('images/logo.png')}}"
+                                data-light="{{ asset('images/logo.png')}}" data-dark="{{ asset('images/logo.png')}}">  --}}
+                             <h6>Smart LMS</h6> 
                         </a>
                         <div class="button-show-hide">
-                            <i class="icon-menu-left"></i>
-                        </div>
+                            <i class="icon-menu-left"></i>                        </div>
                     </div>
                     <div class="center">
                         <div class="center-item">
@@ -105,9 +104,15 @@
                                 
                                 </li>
                                 <li class="menu-item ">
-                                    <a href="{{ route('register') }}" >
+                                    <a href="{{ route('admin.register') }}" >
                                         <div class="icon">    <i class="fas fa-user-plus"></i></div>
                                         <div class="text">Register Employee</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item ">
+                                    <a href="{{ route('index') }}" >
+                                        <div class="icon">    <i class="fas fa-home"></i></div>
+                                        <div class="text">Go To Home</div>
                                     </a>
                                 </li>
                                 <li class="menu-item ">
